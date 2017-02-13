@@ -1,8 +1,8 @@
 # DOCKER-VERSION 1.13.0
 #
-# brunobertechini/centos-lamp-6.8.1
+# brunobertechini/centos-lamp
 #
-# Based on CentOS 6.8
+# Based on CentOS 7.3
 #
 # MySQL root password: empty
 # Change using [root#]/usr/bin/mysqladmin -u root password 'mysql'
@@ -10,7 +10,7 @@
 # Url Phpmyadmin: http://localhost:8080/phpmyadmin
 #
 
-FROM centos:6.8
+FROM centos:latest
 MAINTAINER NgIT "bruno.bertechini@outlook.com"
 
 #
@@ -47,14 +47,22 @@ RUN chmod +x /usr/local/bin/composer
 # Create phpinfo file
 RUN echo '<?php phpinfo(); ?>' >> /var/www/html/phpinfo.php
 
-
 # Configure php.ini
 RUN sed -i -e "s/short_open_tag = Off/short_open_tag = On/" /etc/php.ini
 
 #
 # MYSQL
 #
+#https://www.linode.com/docs/databases/mysql/how-to-install-mysql-on-centos-7
+WORKDIR /tmp
+RUN wget http://repo.mysql.com/mysql-community-release-el7-5.noarch.rpm
+RUN rpm -ivh mysql-community-release-el7-5.noarch.rpm
+RUN yum update -y
 RUN yum install -y mysql-server phpmyadmin
+RUN /usr/bin/mysql-systemd-start pre 
+#RUN /usr/bin/mysqld_safe --basedir=/usr &
+#RUN /usr/bin/mysql-systemd-start post
+
 
 # Allow Access to phpMyAdmin from everyone
 RUN sed -i -e "s/Allow from 127.0.0.1/Allow from ALL/" /etc/httpd/conf.d/phpMyAdmin.conf
@@ -77,7 +85,7 @@ RUN sed -i -e "s/^nodaemon=false/nodaemon=true/" /etc/supervisord.conf
 # add mysqld program to supervisord config
 RUN echo  >> /etc/supervisord.conf
 RUN echo [program:mysqld] >> /etc/supervisord.conf
-RUN echo 'command=/usr/bin/mysqld_safe --datadir=/var/lib/mysql --socket=/var/lib/mysql/mysql.sock --pid-file=/var/run/mysqld/mysqld.pid --basedir=/usr --user=mysql' >> /etc/supervisord.conf
+RUN echo 'command=/usr/bin/mysqld_safe --basedir=/usr' >> /etc/supervisord.conf
 
 # add httpd program to supervisord config
 RUN echo  >> /etc/supervisord.conf
@@ -89,12 +97,6 @@ RUN echo  >> /etc/supervisord.conf
 # Allow Access to phpMyAdmin from everyone
 #
 RUN sed -i -e "s/Allow from 127.0.0.1/Allow from ALL/" /etc/httpd/conf.d/phpMyAdmin.conf
-
-#
-# Start services for the first time
-#
-RUN service mysqld start
-RUN service httpd start
 
 WORKDIR /root
 
