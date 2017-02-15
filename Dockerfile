@@ -5,13 +5,14 @@
 # Based on CentOS 7.3
 #
 # MySQL root password: empty
+#
 # Change using [root#]/usr/bin/mysqladmin -u root password 'mysql'
 #
 # Url Phpmyadmin: http://localhost:8080/phpmyadmin
 #
 
 FROM centos:7.3.1611
-MAINTAINER NgIT "bruno.bertechini@outlook.com"
+MAINTAINER Bruno Bertechini "bruno.bertechini@outlook.com"
 
 #
 # UPDATE PACKAGES
