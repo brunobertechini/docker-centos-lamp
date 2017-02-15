@@ -10,7 +10,7 @@
 # Url Phpmyadmin: http://localhost:8080/phpmyadmin
 #
 
-FROM centos:latest
+FROM centos:7.3.1611
 MAINTAINER NgIT "bruno.bertechini@outlook.com"
 
 #
